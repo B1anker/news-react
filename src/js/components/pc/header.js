@@ -25,7 +25,7 @@ class PcHeader extends React.Component {
 			modalVisible: false,
 			action: 'login',
 			hasLogined: false,
-			username: '',
+			userNickName: '',
 			userId: 0
 		};
 	}
@@ -44,7 +44,18 @@ class PcHeader extends React.Component {
 	}
 
 	handleSubmit(e) {
-		console.log(fetch);
+		e = e || window.event;
+		e.preventDefault();
+		let formData = this.props.form.getFieldsValue();
+		const myFetchOptions = {
+			method: 'GET'
+		};
+		fetch(`http://newsapi.gugujiankong.com/Handler.ashx?action=register&username=username&password=password&r_username=${formData.r_username}&r_confirmPassword=${formData.r_confirmPassword}`, myFetchOptions).then((res) => {
+			let data = res.json;
+			this.setState({userNickName: data.userNickName, userId: data.userId});
+		});
+		Message.success("请求成功！");
+		this.setModalVisible(false);
 	}
 
 	render() {
@@ -106,13 +117,34 @@ class PcHeader extends React.Component {
 								<TabPane tab="注册" key="2">
 									<Form layout="horizontal" onSubmit={this.handleSubmit.bind(this)}>
 										<FormItem label="账户">
-											<Input placeholder="请输入你的账号" {...getFieldDecorator('r_username')}/>
+											{getFieldDecorator('r_username', {
+												rules: [
+													{
+														required: true,
+														message: 'Please input your Username!'
+													}
+												]
+											})(<Input placeholder="请输入你的账号"/>)}
 										</FormItem>
 										<FormItem label="密码">
-											<Input type="password" placeholder="请输入你的密码" {...getFieldDecorator('r_password')}/>
+											{getFieldDecorator('r_password', {
+												rules: [
+													{
+														required: true,
+														message: 'Please input your Password!'
+													}
+												]
+											})(<Input type="password" placeholder="请输入你的密码"/>)}
 										</FormItem>
 										<FormItem label="确认密码">
-											<Input type="password" placeholder="请确认你的账号" {...getFieldDecorator('r_confirm_password')}/>
+											{getFieldDecorator('r_confirmPassword', {
+												rules: [
+													{
+														required: true,
+														message: 'Please confirm your Password!'
+													}
+												]
+											})(<Input type="password" placeholder="请确认你的账号"/>)}
 										</FormItem>
 										<Button type="primary" htmlType="submit">注册</Button>
 									</Form>
@@ -127,4 +159,4 @@ class PcHeader extends React.Component {
 	}
 }
 
-export default PcHeader = Form.create()(PcHeader);
+export default PcHeader = Form.create({})(PcHeader);
