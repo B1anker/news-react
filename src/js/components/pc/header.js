@@ -3,21 +3,15 @@ import {
 	Col,
 	Menu,
 	Icon,
-	Tabs,
-	Form,
 	Input,
-	Message,
-	Button,
-	CheckBox,
-	Modal
+	Button
 } from 'antd';
 
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
-const FormItem = Form.Item;
-const TabPane = Tabs.TabPane;
+import SignModal from '../sign-modal';
 
-class PcHeader extends React.Component {
+const MenuItemGroup = Menu.ItemGroup;
+
+export default class PcHeader extends React.Component {
 	constructor() {
 		super();
 		this.state = {
@@ -36,30 +30,13 @@ class PcHeader extends React.Component {
 
 	handleClickMenu(e) {
 		if (e.key === 'register') {
-			this.setState({current: 'register'});
-			this.setState({modalVisible: true});
+			this.setState({current: 'register', modalVisible: true});
 			return;
 		}
 		this.setState({current: e.key});
 	}
 
-	handleSubmit(e) {
-		e = e || window.event;
-		e.preventDefault();
-		let formData = this.props.form.getFieldsValue();
-		const myFetchOptions = {
-			method: 'GET'
-		};
-		fetch(`http://newsapi.gugujiankong.com/Handler.ashx?action=register&username=username&password=password&r_username=${formData.r_username}&r_confirmPassword=${formData.r_confirmPassword}`, myFetchOptions).then((res) => {
-			let data = res.json;
-			this.setState({userNickName: data.userNickName, userId: data.userId});
-		});
-		Message.success("请求成功！");
-		this.setModalVisible(false);
-	}
-
 	render() {
-		let {getFieldDecorator} = this.props.form;
 		const userShow = this.state.hasLogined
 			? <Menu.Item key="logout" className="register">
 					<Button type="primary" htmlType="button">{this.state.username}</Button>
@@ -112,45 +89,7 @@ class PcHeader extends React.Component {
 							</Menu.Item>
 							{userShow}
 						</Menu>
-						<Modal title="用户中心" wrapClassName="vertical-center" visible={this.state.modalVisible} onCancel={() => this.setModalVisible(false)} onOk={() => this.setModalVisible(false)} okText="关闭">
-							<Tabs type="card">
-								<TabPane tab="注册" key="2">
-									<Form layout="horizontal" onSubmit={this.handleSubmit.bind(this)}>
-										<FormItem label="账户">
-											{getFieldDecorator('r_username', {
-												rules: [
-													{
-														required: true,
-														message: 'Please input your Username!'
-													}
-												]
-											})(<Input placeholder="请输入你的账号"/>)}
-										</FormItem>
-										<FormItem label="密码">
-											{getFieldDecorator('r_password', {
-												rules: [
-													{
-														required: true,
-														message: 'Please input your Password!'
-													}
-												]
-											})(<Input type="password" placeholder="请输入你的密码"/>)}
-										</FormItem>
-										<FormItem label="确认密码">
-											{getFieldDecorator('r_confirmPassword', {
-												rules: [
-													{
-														required: true,
-														message: 'Please confirm your Password!'
-													}
-												]
-											})(<Input type="password" placeholder="请确认你的账号"/>)}
-										</FormItem>
-										<Button type="primary" htmlType="submit">注册</Button>
-									</Form>
-								</TabPane>
-							</Tabs>
-						</Modal>
+						<SignModal modalVisible={this.state.modalVisible} setModalVisible={this.setModalVisible} parent={this}></SignModal>
 					</Col>
 					<Col span={2}></Col>
 				</Row>
@@ -158,5 +97,3 @@ class PcHeader extends React.Component {
 		);
 	}
 }
-
-export default PcHeader = Form.create({})(PcHeader);
