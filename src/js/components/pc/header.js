@@ -6,8 +6,8 @@ import {
 	Input,
 	Button
 } from 'antd';
-
-import SignModal from '../sign-modal';
+import SignModal from '../sign-modal/index';
+import { Link } from 'react-router';
 
 const MenuItemGroup = Menu.ItemGroup;
 
@@ -17,15 +17,27 @@ export default class PcHeader extends React.Component {
 		this.state = {
 			current: 'top',
 			modalVisible: false,
-			action: 'login',
 			hasLogined: false,
 			userNickName: '',
 			userId: 0
 		};
 	}
 
+	componentWillMount() {
+		const userNickName = localStorage.getItem('userNickName');
+		if(userNickName === '' || userNickName === undefined || userNickName === null){
+			return ;
+		}
+			const userId = parseInt(localStorage.getItem('userNickName'));
+			this.setState({userNickName, userId, hasLogined: true});
+	}
+
 	setModalVisible(isVisible) {
 		this.setState({modalVisible: isVisible});
+	}
+
+	handleLogin(params) {
+		this.setState({hasLogined: params.isLogined,userNickName: params.userNickName, userId: params.userId});
 	}
 
 	handleClickMenu(e) {
@@ -36,16 +48,22 @@ export default class PcHeader extends React.Component {
 		this.setState({current: e.key});
 	}
 
+	handleSignout() {
+		localStorage.removeItem('userId');
+		localStorage.removeItem('userNickName');
+		this.setState({hasLogined: false});
+	}
+
 	render() {
 		const userShow = this.state.hasLogined
 			? <Menu.Item key="logout" className="register">
-					<Button type="primary" htmlType="button">{this.state.username}</Button>
+					<Button type="primary" htmlType="button">{this.state.userNickName}</Button>
 					&nbsp;&nbsp;
-					<Link target="_blank">
+					<Link target="_blank" className="block-to-inlineBlock">
 						<Button type="dashed" htmlType="button">个人中心</Button>
 					</Link>
 					&nbsp;&nbsp;
-					<Button type="dashed" htmlType="button">退出</Button>
+					<Button type="ghost" htmlType="button" onClick={this.handleSignout.bind(this)}>退出</Button>
 				</Menu.Item>
 			: <Menu.Item key="register" className="register">
 				<Icon type="appstore"></Icon>注册/登录
@@ -89,7 +107,11 @@ export default class PcHeader extends React.Component {
 							</Menu.Item>
 							{userShow}
 						</Menu>
-						<SignModal modalVisible={this.state.modalVisible} setModalVisible={this.setModalVisible} parent={this}></SignModal>
+						<SignModal modalVisible={this.state.modalVisible}
+							handleLogin={this.handleLogin}
+							setModalVisible={this.setModalVisible}
+							parent={this}>
+						</SignModal>
 					</Col>
 					<Col span={2}></Col>
 				</Row>

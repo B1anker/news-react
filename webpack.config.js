@@ -12,7 +12,7 @@ module.exports = {
 			'@': __dirname + '/src'
 		}
 	},
-	entry: "./src/js/app.js",
+	entry: "./src/js/index.js",
 	module: {
 		loaders: [
 			{

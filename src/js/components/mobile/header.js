@@ -1,5 +1,6 @@
-import SignModal from '../sign-modal';
+import SignModal from '../sign-modal/index';
 import {Icon} from 'antd';
+import { Link } from 'react-router';
 
 export default class MobileHeader extends React.Component {
 	constructor() {
@@ -7,11 +8,19 @@ export default class MobileHeader extends React.Component {
 		this.state = {
 			current: 'top',
 			modalVisible: false,
-			action: 'login',
 			hasLogined: false,
 			userNickName: '',
 			userId: 0
 		};
+	}
+
+	componentWillMount() {
+		const userNickName = localStorage.getItem('userNickName');
+		if(userNickName === '' || userNickName === undefined || userNickName === null){
+			return ;
+		}
+			const userId = parseInt(localStorage.getItem('userNickName'));
+			this.setState({userNickName, userId, hasLogined: true});
 	}
 
 	setModalVisible(isVisible) {
@@ -22,9 +31,13 @@ export default class MobileHeader extends React.Component {
 		this.setState({modalVisible: true});
 	}
 
+	handleLogin(params) {
+		this.setState({hasLogined: params.isLogined,userNickName: params.userNickName, userId: params.userId});
+	}
+
 	render() {
 		const userShow = this.state.hasLogined
-			? <Link>
+			? <Link target="_blank">
 					<Icon type="inbox"/>
 				</Link>
 			: <Icon type="setting" onClick={this.login.bind(this)}/>
@@ -33,7 +46,12 @@ export default class MobileHeader extends React.Component {
 				<img src="./src/images/logo.png" alt="logo"/>
 				<span>ReactNews</span>
 				{userShow}
-				<SignModal modalVisible={this.state.modalVisible} setModalVisible={this.setModalVisible} parent={this}></SignModal>
+				<SignModal
+					modalVisible={this.state.modalVisible}
+					handleLogin={this.handleLogin}
+					setModalVisible={this.setModalVisible}
+					parent={this}>
+				</SignModal>
 			</header>
 		);
 	}
